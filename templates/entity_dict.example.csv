@@ -1,0 +1,4 @@
+alias,canonical,kind
+<canonical name>,<canonical name>,<kind>
+<alias or abbreviation>,<canonical name>,<kind>
+<demonym or misspelling>,<canonical name>,<kind>

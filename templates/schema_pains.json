@@ -1,0 +1,44 @@
+{
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["results"],
+  "properties": {
+    "results": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "kind", "segment", "segment_evidence", "practices", "pains", "flag", "flag_evidence"],
+        "properties": {
+          "id": {"type": "string"},
+          "kind": {"type": "string", "enum": ["own", "general", "other_person", "promo"]},
+          "segment": {"type": "string", "enum": ["seg1", "seg2", "seg3", "unknown"]},
+          "segment_evidence": {"type": ["string", "null"]},
+          "practices": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["name", "evidence"],
+              "properties": {"name": {"type": "string"}, "evidence": {"type": "string"}}
+            }
+          },
+          "pains": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["pain", "evidence"],
+              "properties": {
+                "pain": {"type": "string", "enum": ["pain_1", "pain_2", "pain_3", "pain_4", "pain_5", "pain_6"]},
+                "evidence": {"type": "string"}
+              }
+            }
+          },
+          "flag": {"type": "boolean"},
+          "flag_evidence": {"type": ["string", "null"]}
+        }
+      }
+    }
+  }
+}

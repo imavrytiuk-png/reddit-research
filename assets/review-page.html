@@ -1,0 +1,159 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Label review</title>
+<style>
+:root {
+  --font-sans: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, monospace;
+  --container: 46rem; --radius: 12px; --radius-sm: 8px; --duration: .2s;
+  --bg: #fcfcfc; --surface: #fff; --gray-200: #f6f6f6; --gray-300: #f0f0f0; --gray-500: #e0e0e0;
+  --gray-900: #8d8d8d; --gray-1100: #6f6f6f; --gray-1200: #202020; --paragraph: #424242;
+  --shadow-custom: 0 0 0 1px rgba(0,0,0,.06), 0 1px 2px -1px rgba(0,0,0,.06), 0 2px 4px 0 rgba(0,0,0,.04);
+  --ok-bg: #e9f5ea; --ok-fg: #1f6b27; --bad-bg: #fdecec; --bad-fg: #a3241f; --mark: #fff1b8;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #101010; --surface: #161616; --gray-200: #191919; --gray-300: #222; --gray-500: #313131;
+  --gray-900: #6e6e6e; --gray-1100: #b5b5b5; --gray-1200: #eee; --paragraph: #dbdbdb;
+  --shadow-custom: 0 0 0 1px rgba(255,255,255,.08); --ok-bg: #12261a; --ok-fg: #7fd18a; --bad-bg: #2c1414; --bad-fg: #f08f8a; --mark: #4a3d0a;
+  color-scheme: dark; } }
+:root[data-theme="dark"] {
+  --bg: #101010; --surface: #161616; --gray-200: #191919; --gray-300: #222; --gray-500: #313131;
+  --gray-900: #6e6e6e; --gray-1100: #b5b5b5; --gray-1200: #eee; --paragraph: #dbdbdb;
+  --shadow-custom: 0 0 0 1px rgba(255,255,255,.08); --ok-bg: #12261a; --ok-fg: #7fd18a; --bad-bg: #2c1414; --bad-fg: #f08f8a; --mark: #4a3d0a;
+  color-scheme: dark; }
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--gray-1200); font-family: var(--font-sans); font-size: 15px; line-height: 1.6; -webkit-font-smoothing: antialiased; }
+.page { max-width: var(--container); margin-inline: auto; padding: 32px 16px 96px; }
+h1, h2, p { margin: 0; }
+h1 { font-size: 22px; font-weight: 600; line-height: 1.3; }
+.muted { color: var(--gray-1100); font-size: 14px; }
+.card { background: var(--surface); border-radius: var(--radius); box-shadow: var(--shadow-custom); padding: 16px; margin-top: 16px; }
+.bar { position: sticky; top: 0; z-index: 5; background: var(--bg); padding: 10px 0; display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.progress { flex: 1; min-width: 120px; height: 8px; border-radius: 999px; background: var(--gray-300); overflow: hidden; }
+.progress i { display: block; height: 100%; width: 0; background: var(--gray-1200); transition: width var(--duration) ease-out; }
+button { font: inherit; color: inherit; background: var(--surface); border: 0; box-shadow: var(--shadow-custom); border-radius: 999px; padding: 6px 14px; cursor: pointer; transition: background var(--duration) ease-out; }
+button:hover { background: var(--gray-200); }
+button:focus-visible, input:focus-visible, textarea:focus-visible { outline: 2px solid var(--gray-1100); outline-offset: 2px; }
+.title { font-weight: 600; margin-top: 4px; }
+.text { white-space: pre-wrap; color: var(--paragraph); margin-top: 10px; font-size: 14.5px; }
+mark { background: var(--mark); color: inherit; border-radius: 3px; padding: 0 2px; }
+table { width: 100%; border-collapse: collapse; margin-top: 12px; font-size: 14px; }
+th, td { text-align: left; vertical-align: top; padding: 8px 6px; border-top: 1px solid var(--gray-300); }
+th { color: var(--gray-1100); font-weight: 500; font-size: 13px; }
+td.ev { color: var(--gray-1100); font-size: 13px; }
+.mono { font-family: var(--font-mono); font-size: 12.5px; }
+.mark { display: inline-flex; gap: 4px; }
+.mark button { padding: 3px 10px; font-size: 13px; }
+.mark button.ok[aria-pressed="true"] { background: var(--ok-bg); color: var(--ok-fg); }
+.mark button.bad[aria-pressed="true"] { background: var(--bad-bg); color: var(--bad-fg); }
+textarea, input[type=text] { width: 100%; font: inherit; font-size: 14px; padding: 8px 10px; border: 0; border-radius: var(--radius-sm); background: var(--gray-200); color: inherit; margin-top: 10px; }
+.row-actions { display: flex; gap: 8px; margin-top: 12px; flex-wrap: wrap; }
+@media (max-width: 480px) { th:nth-child(3), td:nth-child(3) { display: none; } }
+</style>
+</head>
+<body>
+<div class="page">
+  <h1 id="h1">Label review</h1>
+  <p class="muted" id="lede">For each item: read the text, check every label against it, mark ok or bad, add a note when something is missing. Marks save in this browser as you go. At the end press Export and send the file back.</p>
+  <div class="bar">
+    <button id="prev" aria-label="Previous item">← Prev</button>
+    <div class="progress" aria-hidden="true"><i id="pbar"></i></div>
+    <span class="muted" id="pos"></span>
+    <button id="next" aria-label="Next item">Next →</button>
+    <button id="export">Export JSON</button>
+  </div>
+  <div id="item"></div>
+</div>
+<script>
+const DATA = /*DATA*/;
+const KEY = "review:" + (DATA.title || "labels");
+const items = DATA.items || [];
+let idx = 0, marks = {};
+try { marks = JSON.parse(localStorage.getItem(KEY) || "{}"); } catch (e) { marks = {}; }
+function save() { try { localStorage.setItem(KEY, JSON.stringify(marks)); } catch (e) {} }
+function esc(s) { return String(s).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c])); }
+function isEvKey(k) { return k === "evidence" || k.endsWith("_evidence"); }
+function quotes(node, out) {
+  if (Array.isArray(node)) node.forEach(n => quotes(n, out));
+  else if (node && typeof node === "object") for (const [k, v] of Object.entries(node)) {
+    if (isEvKey(k) && typeof v === "string" && v.trim()) v.split(/\s*(?:\.\.\.|…)\s*/).forEach(f => f && out.push(f));
+    else quotes(v, out);
+  }
+  return out;
+}
+function highlight(text, qs) {
+  const lower = text.toLowerCase(); const ranges = [];
+  for (const q of qs) { const ql = q.toLowerCase(); let i = lower.indexOf(ql); while (i >= 0 && ql.length) { ranges.push([i, i + ql.length]); i = lower.indexOf(ql, i + 1); } }
+  ranges.sort((a, b) => a[0] - b[0]); const merged = [];
+  for (const r of ranges) { const last = merged[merged.length - 1]; if (last && r[0] <= last[1]) last[1] = Math.max(last[1], r[1]); else merged.push(r.slice()); }
+  let html = "", pos = 0;
+  for (const [s, e] of merged) { html += esc(text.slice(pos, s)) + "<mark>" + esc(text.slice(s, e)) + "</mark>"; pos = e; }
+  return html + esc(text.slice(pos));
+}
+function rows(labels) {
+  const out = [];
+  for (const [k, v] of Object.entries(labels || {})) {
+    if (k === "id" || isEvKey(k)) continue;
+    if (Array.isArray(v)) {
+      if (!v.length) { out.push({key: k, value: "(none)", ev: ""}); continue; }
+      v.forEach((el, i) => {
+        if (el && typeof el === "object") {
+          const parts = Object.entries(el).filter(([kk]) => !isEvKey(kk)).map(([kk, vv]) => kk + ": " + (vv === null ? "—" : vv));
+          out.push({key: k + "[" + i + "]", value: parts.join(" · "), ev: el.evidence || ""});
+        } else out.push({key: k + "[" + i + "]", value: String(el), ev: ""});
+      });
+    } else if (v && typeof v === "object") {
+      out.push({key: k, value: JSON.stringify(v), ev: v.evidence || ""});
+    } else {
+      out.push({key: k, value: v === null ? "—" : String(v), ev: labels[k + "_evidence"] || ""});
+    }
+  }
+  return out;
+}
+function render() {
+  const it = items[idx]; if (!it) { document.getElementById("item").innerHTML = "<div class='card'>No items.</div>"; return; }
+  const m = marks[it.id] || (marks[it.id] = {rows: {}, note: ""});
+  const qs = quotes(it.labels, []);
+  const text = (it.title ? it.title + "\n\n" : "") + (it.text || "");
+  const r = rows(it.labels);
+  document.getElementById("pos").textContent = (idx + 1) + " / " + items.length + "  ·  " + Object.keys(marks).filter(k => Object.keys(marks[k].rows || {}).length).length + " reviewed";
+  document.getElementById("pbar").style.width = (100 * (idx + 1) / items.length) + "%";
+  document.getElementById("item").innerHTML = `
+    <div class="card">
+      <div class="muted mono">${esc(it.id)}${it.meta ? " · " + esc(it.meta) : ""}</div>
+      <div class="text">${highlight(text, qs)}</div>
+    </div>
+    <div class="card">
+      <table><thead><tr><th>Field</th><th>Label</th><th>Quote</th><th>Mark</th></tr></thead><tbody>
+      ${r.map(x => `<tr><td class="mono">${esc(x.key)}</td><td>${esc(x.value)}</td><td class="ev">${esc(x.ev)}</td>
+        <td><span class="mark" data-row="${esc(x.key)}">
+          <button class="ok" aria-pressed="${m.rows[x.key] === "ok"}">ok</button>
+          <button class="bad" aria-pressed="${m.rows[x.key] === "bad"}">bad</button></span></td></tr>`).join("")}
+      </tbody></table>
+      <label class="muted" for="note">Note: what is missing or wrong (optional)</label>
+      <textarea id="note" rows="2">${esc(m.note || "")}</textarea>
+      <div class="row-actions"><button id="allok">All ok</button></div>
+    </div>`;
+  document.querySelectorAll(".mark").forEach(span => span.querySelectorAll("button").forEach(b => b.addEventListener("click", () => {
+    m.rows[span.dataset.row] = b.classList.contains("ok") ? "ok" : "bad"; save(); render();
+  })));
+  document.getElementById("note").addEventListener("input", e => { m.note = e.target.value; save(); });
+  document.getElementById("allok").addEventListener("click", () => { r.forEach(x => m.rows[x.key] = "ok"); save(); render(); });
+}
+document.getElementById("prev").addEventListener("click", () => { idx = Math.max(0, idx - 1); render(); });
+document.getElementById("next").addEventListener("click", () => { idx = Math.min(items.length - 1, idx + 1); render(); });
+document.addEventListener("keydown", e => { if (e.target.tagName === "TEXTAREA" || e.target.tagName === "INPUT") return;
+  if (e.key === "ArrowRight") document.getElementById("next").click(); if (e.key === "ArrowLeft") document.getElementById("prev").click(); });
+document.getElementById("export").addEventListener("click", () => {
+  const blob = new Blob([JSON.stringify({title: DATA.title, exported_at: new Date().toISOString(), marks}, null, 1)], {type: "application/json"});
+  const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = "review-" + (DATA.title || "labels").replace(/\W+/g, "-") + ".json"; a.click();
+});
+document.getElementById("h1").textContent = DATA.title || "Label review"; document.title = DATA.title || "Label review";
+render();
+</script>
+</body>
+</html>

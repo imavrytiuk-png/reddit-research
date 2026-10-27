@@ -1,0 +1,25 @@
+# Plan for scripts/treg_reddit_search.py: an OPTIONAL paid fallback that needs the treg CLI; the archive is the primary source.
+# Reddit caps every query at 252 results, so this is for recent days and cross-checks.
+endpoint: tikhub            # tikhub.x.reddit-app-fetch-dynamic-search: 7 posts/page, full text
+                            # scrapecreators.x.v1-reddit-subreddit-search: titles only
+
+adaptive_stop:              # stop a (sub, phrase, sort, timeframe) group after
+  min_novelty: 0.20         # `consecutive_pages` pages in a row with under 20% new ids
+  consecutive_pages: 2
+
+defaults:
+  passes:
+    - {sort: relevance, timeframe: year, max_pages: 300}
+    - {sort: new, timeframe: year, max_pages: 300, max_age_days: 365}
+  phrases:                  # intent phrases from the explore step; no answers, brands or places
+    - <intent phrase 1>
+    - <intent phrase 2>
+    - <intent phrase 3>
+
+subreddits:                 # the confirmed list from scouting; per-sub overrides allowed
+  <sub_a>: {}
+  <sub_b>: {extra_phrases: [<phrase only this sub uses>]}
+  <sub_c>:
+    phrases: [<tag every title carries>]   # one chronological sweep instead of phrases
+    passes:
+      - {sort: new, timeframe: year, max_pages: 300, max_age_days: 365}
