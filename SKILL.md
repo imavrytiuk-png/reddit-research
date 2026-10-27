@@ -8,9 +8,7 @@ description: >-
   mix for the market. Use it whenever the user wants to study an audience, a niche,
   demand, pains, preferences or alternatives through Reddit, subreddits,
   forum threads or "what people say online", asks for a Reddit pull, scrape, dataset or
-  labelling run, says «ресёрч через реддит», «боли через реддит», «сабреддиты»,
-  «вытянуть треды», «кто/куда/что хотят люди», or wants a cheap substitute for customer
-  interviews. Also use it to continue, audit or extend such a study (gold standard,
+  labelling run, or wants a cheap substitute for customer interviews. Also use it to continue, audit or extend such a study (gold standard,
   relabelling, segment matrix, "part 2"). Not for summarising one thread, for posting to
   Reddit, or for competitor/app-store numbers.
 ---

@@ -76,7 +76,7 @@ One label; passing statements inside a long text count; a wish alone is not a si
 ## practices: the methods, tools and formats the author uses
 
 A practice is something the author does or uses, named in the text: <"paper journal",
-"habit app", "369 method", "WDT tool", "bottomless portafilter">. Use the canonical names
+"habit app", "pomodoro", "WDT tool", "bottomless portafilter">. Use the canonical names
 from the hints list where one exists; otherwise the text's own name, short, lowercase.
 - Include: what the author does now, did before, tried once, or is about to start.
 - Exclude: practices only recommended to others, named in a quote from someone else, or

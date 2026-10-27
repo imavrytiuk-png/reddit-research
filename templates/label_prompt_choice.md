@@ -79,8 +79,8 @@ Rules:
 ## entities: the options the author chooses between
 
 List every <entity> the author personally considers, uses, used or rejected. One entry
-per entity; `sub` is the finer level when the question has one (country · city, brand ·
-model), else null.
+per entity; `sub` is the finer level when the question has one (brand · model, platform ·
+plan), else null.
 - **considering**: weighs it, chose it, or is preparing for it, and has not started. Hedged
   and firm both count.
 - **using**: has it or is in it now; the text speaks in the present.
@@ -132,7 +132,7 @@ quotes from the sample.
 7. "<story that ends in a link, discount code or 'DM me'>". kind "promo".
 8. "<someone else's case: 'my brother is looking for …'>". kind "not_own".
 9. Title only: "<X or Y?>". kind "own", X and Y "considering".
-10. Title only: "<bare product or place name>". kind "not_own": nothing says the author's
+10. Title only: "<bare product or service name>". kind "not_own": nothing says the author's
     own case.
 10b. "<the author's own story on a neighbouring topic, no entity of this question>". kind
     "not_own": own case, wrong behaviour.
