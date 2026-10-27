@@ -112,6 +112,7 @@ def main() -> int:
             lines += [f"## {f} ({len(d)} items)", "", "| id | A | B | title |", "|---|---|---|---|"]
             for i, x, y in d[: a.max_list]:
                 t = (items[i].get("title") or items[i].get("post_title") or "")[:80].replace("|", "/")
+                x, y = (str(v).replace("|", "\\|") for v in (x, y))
                 lines.append(f"| {i} | {x} | {y} | {t} |")
             if len(d) > a.max_list:
                 lines.append(f"| … | {len(d) - a.max_list} more | | |")

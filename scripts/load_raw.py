@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # /// script
 # requires-python = ">=3.9"
-# dependencies = ["duckdb>=1.0"]
+# dependencies = ["duckdb>=1.0,<2"]
 # ///
 """Rebuild <root>/reddit.duckdb from raw/: Arctic Shift pages (arctic_shift_archive.py)
 and treg search pages (treg_reddit_search.py). Raw is the truth; both tables are
@@ -27,6 +27,7 @@ from __future__ import annotations
 import argparse
 import datetime as dt
 import json
+import os
 import sys
 import tempfile
 from collections import Counter, defaultdict
@@ -212,7 +213,13 @@ def unfinished_windows(root: Path, kind: str) -> list[tuple[str, str, str, str, 
 
 def build(root: Path, db: str) -> None:
     posts, comments = load_posts(root / "raw"), load_comments(root / "raw")
-    con = duckdb.connect(str(root / db))
+    target = root / db
+    if not posts and not comments:
+        sys.exit(f"nothing to load: no raw files under {root / 'raw'}; {target} left untouched")
+    tmp = target.with_name(target.name + ".building")  # built aside and swapped in at the end: a crash leaves the old database
+    if tmp.exists():
+        tmp.unlink()
+    con = duckdb.connect(str(tmp))
     con.execute("SET TimeZone='UTC'")  # day bins and spans in UTC; the Mac's zone shifts 23:59 UTC into the next day
     con.execute("DROP TABLE IF EXISTS posts; DROP TABLE IF EXISTS comments")
     con.execute("""CREATE TABLE posts (id VARCHAR PRIMARY KEY, subreddit VARCHAR, author VARCHAR, title VARCHAR,
@@ -256,6 +263,7 @@ def build(root: Path, db: str) -> None:
         orphans = con.execute("SELECT count(*) FROM comments c LEFT JOIN posts p ON p.id=c.post_id WHERE p.id IS NULL").fetchone()[0]
         print(f"  orphan comments (post outside the loaded posts; expected at window edges): {orphans:,d}")
     con.close()
+    os.replace(tmp, target)
 
 
 def selftest() -> int:

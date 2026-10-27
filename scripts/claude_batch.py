@@ -34,7 +34,8 @@ Discipline:
 Results: <root>/out/<tag>_results.ndjson, one line per item:
   {"id", "model_tag", "prompt_version", "model", "batch", "result": {...}, "labelled_at"}
 Run evidence_check.py on it next. Exit codes: 0 nothing pending / all done, 3 stopped
-(limit, signal or time), 1 error.
+(limit, signal, time, or the --max-calls cap: default 1000 model calls per invocation, the
+same command resumes), 1 error.
 
 Usage:
   python3 claude_batch.py --items items.ndjson --prompt prompt.md --schema schema.json \
@@ -248,6 +249,9 @@ class Runner:
             self.stats["cache_creation"] += u.get("cache_creation_input_tokens", 0) or 0
             self.stats["cost_usd"] += outer.get("total_cost_usd", 0) or 0
 
+    def calls_capped(self) -> bool:
+        return bool(self.a.max_calls) and self.stats["calls"] >= self.a.max_calls
+
     def persist(self, items: list[dict], batch_n):
         now = dt.datetime.now(dt.timezone.utc).isoformat(timespec="seconds")
         for it in items:
@@ -278,7 +282,7 @@ class Runner:
         prompt = json.dumps(items, ensure_ascii=False)
         reason = None
         for attempt, extra in enumerate(["", REMINDER]):
-            if _stop.is_set() or time_up():
+            if _stop.is_set() or time_up() or self.calls_capped():
                 _stop.set()
                 return
             try:
@@ -337,6 +341,7 @@ def main() -> int:
     ap.add_argument("--ids-file", type=Path, default=None, help="only these ids, one per line")
     ap.add_argument("--retry-failed", action="store_true")
     ap.add_argument("--max-minutes", type=float, default=None)
+    ap.add_argument("--max-calls", type=int, default=1000, help="stop (exit 3) after N model calls in this invocation; 0 = no cap")
     ap.add_argument("--timeout", type=int, default=240, help="seconds per CLI call")
     ap.add_argument("--seed", type=int, default=20260101)
     ap.add_argument("--dry-run", action="store_true")
@@ -396,13 +401,15 @@ def main() -> int:
     if limit_hit:
         stop_reason = f"usage limit: {limit_hit[:160]}"
     elif _stop.is_set():
-        stop_reason = "time cap" if time_up() else "signal"
+        stop_reason = "time cap" if time_up() else ("calls cap" if runner.calls_capped() else "signal")
     s = runner.stats
     summary = (f"stats: stop={stop_reason} calls={s['calls']} items_done={s['items_done']} items_failed={s['items_failed']} "
                f"batches_done={s['batches_done']} wall_s={s['wall_seconds']:.0f} run_s={time.monotonic() - started:.0f} "
                f"cost_usd={s['cost_usd']:.4f} in_tok={s['input_tokens']} out_tok={s['output_tokens']} "
                f"cache_read={s['cache_read']} cache_create={s['cache_creation']}")
     print(summary, file=sys.stderr)
+    if stop_reason == "calls cap":
+        print(f"HINT: --max-calls {a.max_calls} reached; re-run the same command to continue (0 = no cap)", file=sys.stderr)
     with (runner.root / "logs" / f"{a.model_tag}_sessions.md").open("a", encoding="utf-8") as f:
         f.write(f"\n- {dt.datetime.now(dt.timezone.utc):%Y-%m-%dT%H:%M:%SZ} {summary}\n")
     if "weekly" in (limit_hit or "").lower():

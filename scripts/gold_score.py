@@ -29,6 +29,7 @@ from collections import defaultdict
 from pathlib import Path
 
 FOLD = re.compile(r"\[\d+\]$")
+CTRL = re.compile(r"[\x00-\x08\x0b-\x1f\x7f]")  # reviewer notes go to the terminal: strip control characters
 
 
 def fold(row: str) -> str:
@@ -115,7 +116,7 @@ def run(marks_paths: list[Path], results: Path | None, out: Path | None, max_not
         print(f"\nreviewer {p.name}: {s['items_reviewed']} items reviewed{of}, {s['rows']} rows marked, {len(s['notes'])} notes")
         print(fmt_table(s["fields"]))
         for i, note in s["notes"][:max_notes]:
-            print(f"  note {i}: {note}")
+            print(f"  note {i}: {CTRL.sub('', note)}")
         if len(s["notes"]) > max_notes:
             print(f"  ... {len(s['notes']) - max_notes} more notes (--notes N)")
     if len(all_marks) >= 2:

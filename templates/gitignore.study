@@ -1,0 +1,10 @@
+# study root .gitignore: everything with text, quotes or the salt stays local
+*.duckdb
+*.duckdb.wal
+*.building
+raw/
+raw_llm/
+logs/
+state/salt.txt
+items/
+review/

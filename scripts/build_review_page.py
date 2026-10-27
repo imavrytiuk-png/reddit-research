@@ -54,7 +54,7 @@ def main() -> int:
         data["items"].append({"id": i, "title": it.get(a.title_key) or "", "text": it.get(a.text_key) or "",
                               "meta": meta, "labels": labels[i]})
     page = a.template.read_text(encoding="utf-8")
-    blob = json.dumps(data, ensure_ascii=False, separators=(",", ":")).replace("</", "<\\/")
+    blob = json.dumps(data, ensure_ascii=False, separators=(",", ":")).replace("<", "\\u003c")  # no </script> or <!-- can come from the data
     a.out.parent.mkdir(parents=True, exist_ok=True)
     a.out.write_text(page.replace("/*DATA*/", blob), encoding="utf-8")
     print(f"{a.out}: {len(data['items'])} items", file=sys.stderr)

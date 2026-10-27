@@ -72,6 +72,15 @@ def parse_extra(spec: str):
     return name, list_key, (name_key or None), fk, fv
 
 
+def csv_safe(v):
+    """Spreadsheets run a cell that starts with = + - @ or a tab as a formula; entity names come from Reddit."""
+    return "'" + v if isinstance(v, str) and v[:1] in "=+-@\t\r" else v
+
+
+def md_safe(v):
+    return str(v).replace("|", "\\|")
+
+
 def is_own(r: dict, kind_key: str, own_values: set) -> bool:
     """Own-case row: the kind is one of --own-values (or the schema has no kind at all)."""
     return (kind_key not in r) or (r.get(kind_key) in own_values)
@@ -203,9 +212,9 @@ def aggregate(a: argparse.Namespace) -> dict:
             matrices[(g, level)] = matrix
             md = [f"### {g} · {level}  (share of the segment's people naming the entity; empty < {a.cell_min} people, "
                   f"* = under {a.fill_min}" + ("; weighted by sampling weight" if weighted else "") + ")",
-                  "| segment | people | top-3 | " + " | ".join(cols) + " |", "|---|---:|---:|" + "---:|" * len(cols)]
+                  "| segment | people | top-3 | " + " | ".join(md_safe(c) for c in cols) + " |", "|---|---:|---:|" + "---:|" * len(cols)]
             for r in matrix["rows"]:
-                md.append(f"| {r['segment']} | {r['people']} | {r['top3']}% | " + " | ".join(
+                md.append(f"| {md_safe(r['segment'])} | {r['people']} | {r['top3']}% | " + " | ".join(
                     "" if c["share"] is None else f"{c['share']}%{'' if c['fill'] else '*'}" for c in r["cells"]) + " |")
             if matrix["sensitivity"]["order_changes"]:
                 md.append(f"\nFractional votes change the column order: {', '.join(cols_frac)}")
@@ -214,9 +223,9 @@ def aggregate(a: argparse.Namespace) -> dict:
                 stem.with_suffix(".json").write_text(json.dumps(matrix, ensure_ascii=False, indent=1))
                 with stem.with_suffix(".csv").open("w", encoding="utf-8", newline="") as f:
                     w = csv.writer(f)
-                    w.writerow(["segment", "people", "top3"] + cols)
+                    w.writerow(["segment", "people", "top3"] + [csv_safe(c) for c in cols])
                     for r in matrix["rows"]:
-                        w.writerow([r["segment"], r["people"], r["top3"]] + [("" if c["share"] is None else c["share"]) for c in r["cells"]])
+                        w.writerow([csv_safe(r["segment"]), r["people"], r["top3"]] + [("" if c["share"] is None else c["share"]) for c in r["cells"]])
                 stem.with_suffix(".md").write_text("\n".join(md) + "\n")
                 print("\n".join(md) + "\n")
         totals = Counter()

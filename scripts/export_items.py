@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # /// script
 # requires-python = ">=3.9"
-# dependencies = ["duckdb>=1.0"]
+# dependencies = ["duckdb>=1.0,<2"]
 # ///
 """Export items for reading or labelling from <root>/reddit.duckdb to NDJSON.
 
@@ -84,6 +84,7 @@ def get_salt(root: Path, create: bool) -> str:
                      "a new salt gives every person a new hash and splits them in two.")
         p.parent.mkdir(parents=True, exist_ok=True)
         p.write_text(secrets.token_hex(16))
+        p.chmod(0o600)
         print(f"created {p} (keep it out of git)", file=sys.stderr)
     return p.read_text().strip()
 

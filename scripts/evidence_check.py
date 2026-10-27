@@ -50,7 +50,7 @@ MD_CHARS = set("*_`>#~")
 WS_RE = re.compile(r"\s+")
 FRAG_RE = re.compile(r"\s*(?:\.\.\.|…)\s*")
 CONTRACTIONS = [
-    (re.compile(r"\b(i|you|we|they)\s*'?\s*m\b"), r"\1 am"),
+    (re.compile(r"\b(i|you|we|they)[\s']*m\b"), r"\1 am"),  # one char class: linear on long whitespace runs
     (re.compile(r"\bi am\b"), "i am"),
     (re.compile(r"\b(i|you|we|they)'ve\b"), r"\1 have"),
     (re.compile(r"\b(i|you|we|they|he|she|it)'ll\b"), r"\1 will"),

@@ -49,7 +49,9 @@ python3 scripts/arctic_shift_archive.py --kind comments --subs a,b,c --start ...
 pull's time left is then computed from pages instead of windows (a giant's window is 50
 pages, a small sub's is 2). Re-running resumes; `--retry-failed` resumes failed tasks;
 `--max-minutes N` stops cleanly at a time cap the owner set (exit 3, same command
-resumes); `kill -INT $(cat state/archive_posts.pid)` does the same by hand.
+resumes); `kill -INT $(cat state/archive_posts.pid)` does the same by hand (check with
+`ps -p $(cat state/archive_posts.pid) -o command=` first: a stale pid file can point at
+another process).
 
 Windows step one calendar month from `--start` (10-18 → 11-18 → 12-18), not calendar
 months. Inside a window pages run oldest to newest, so a window stopped half-way holds

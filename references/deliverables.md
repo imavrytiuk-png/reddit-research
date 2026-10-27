@@ -45,7 +45,8 @@ append a dated entry per session: decisions, numbers, what is pending.
 ## 6. Git hygiene
 
 Commit: scripts, versioned prompts, `report_data/` matrices and summaries, docs.
-Keep out of a public repository: `*.duckdb`, `raw/`, `raw_llm/`, `logs/`,
+Copy `templates/gitignore.study` to the study root as `.gitignore`. Keep out of a public
+repository: `*.duckdb`, `raw/`, `raw_llm/`, `logs/`,
 `state/salt.txt`, items and review files (they hold text and quotes), large CSVs.
 Before ending a session: no stray temp files, nothing from the research only in the chat.
 

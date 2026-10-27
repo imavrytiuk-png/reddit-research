@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # /// script
 # requires-python = ">=3.10"
-# dependencies = ["pyyaml>=6.0"]
+# dependencies = ["pyyaml>=6.0,<7"]
 # ///
 """Resilient Reddit search collector through the treg CLI (paid fallback to the archive).
 
@@ -252,6 +252,8 @@ class Collector:
         cmd = [TREG, "call", self.ep["id"]]
         for k, v in params.items():
             cmd += ["-p", f"{k}={v}"]
+        with self.lock:
+            self.calls += 1  # counted before the call: a timed-out call may still be charged
         try:
             proc = subprocess.run(cmd, capture_output=True, text=True, timeout=CALL_TIMEOUT, start_new_session=True)
         except subprocess.TimeoutExpired:
@@ -262,7 +264,6 @@ class Collector:
         m = re.search(r"charged \$([0-9.]+)", stderr)
         cost = float(m.group(1)) if m else 0.0
         with self.lock:
-            self.calls += 1
             self.spent += cost
             calls = self.calls
         if calls % BALANCE_CHECK_EVERY == 0:

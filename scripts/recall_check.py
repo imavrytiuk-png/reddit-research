@@ -30,7 +30,7 @@ Usage:
   python3 recall_check.py --items items/control.ndjson --results out/S-ctl_grounded.ndjson \\
       --regex-file state/prefilter_app.txt state/prefilter_manual.txt --slice uniform \\
       --extra-group practice=practices --extra-group pain=pains@pain --extra-own-only \\
-      --whole-subs ynab,MonarchMoney --population 115542 --prefilter-count 6403 --out out/recall.json
+      --whole-subs ynab,MonarchMoney --population 120000 --prefilter-count 6000 --out out/recall.json
 """
 from __future__ import annotations
 
